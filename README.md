@@ -15,38 +15,58 @@ $ git clone https://github.com/greyli/moments
 $ cd moments
 ```
 
-Install dependencies with [PDM](https://pdm.fming.dev):
+1. Install uv package manager \
+Preferred approaches - \
+for Windows : 
 
-```
-$ pdm install
-```
-
-> [!TIP]
-> If you don't have PDM installed, you can create a virtual environment with `venv` and install dependencies with `pip install -r requirements.txt`.
-
-To initialize the app, run the `flask init-app` command:
-
-```
-$ pdm run flask init-app
+```shell
+winget install --id=astral-sh.uv  -e
 ```
 
-If you just want to try it out, generate fake data with `flask lorem` command then run the app:
+for macOS : 
 
+```shell
+brew install uv
 ```
-$ pdm run flask lorem
+
+Alternate approach : 
+
+```shell
+pip install uv
 ```
 
-It will create a test account:
+2. Navigate to your project directory <br><br>
+3. Sync all dependencies from the pyproject.toml to your project. uv sync creates a virtual environment if one doesn't already exist and it creates a uv.lock file which records the exact version of all dependencies.
+```shell
+uv sync
+```
+4. Follow the steps mentioned in the readme : To initialize the app, run the flask init-app command:
+```shell
+uv run flask init-app
+```
+If you just want to try it out, generate fake data with flask lorem command then run the app:
+```shell
+uv run flask lorem
+```
+(If you see an error for any missing dependencies, you can add them in the following way and try running the command again)
+```shell
+uv add Faker
+uv add azure-ai-vision-imageanalysis
+```
 
-* email: `admin@helloflask.com`
-* password: `moments`
+Lorem will create a test account:
+
+email: admin@helloflask.com \
+password: moments
 
 Now you can run the app:
-
+```shell
+uv run flask run
 ```
-$ pdm run flask run
 * Running on http://127.0.0.1:5000/
-```
+
+5. Create A Computer Vision Azure AI resource and set environment variables for VISION_ENDPOINT and VISION_KEY
+
 
 ## License
 
