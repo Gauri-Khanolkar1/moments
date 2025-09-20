@@ -9,6 +9,7 @@ from moments.forms.main import CommentForm, DescriptionForm, TagForm
 from moments.models import Collection, Comment, Follow, Notification, Photo, Tag, User
 from moments.notifications import push_collect_notification, push_comment_notification
 from moments.utils import flash_errors, redirect_back, rename_image, resize_image, validate_image
+from moments.vision import analyze_image
 
 main_bp = Blueprint('main', __name__)
 
@@ -131,12 +132,19 @@ def upload():
             return 'Invalid image.', 400
         filename = rename_image(f.filename)
         f.save(current_app.config['MOMENTS_UPLOAD_PATH'] / filename)
+        objects_list = analyze_image(current_app.config['MOMENTS_UPLOAD_PATH'] / filename)
         filename_s = resize_image(f, filename, current_app.config['MOMENTS_PHOTO_SIZES']['small'])
         filename_m = resize_image(f, filename, current_app.config['MOMENTS_PHOTO_SIZES']['medium'])
         photo = Photo(
             filename=filename, filename_s=filename_s, filename_m=filename_m, author=current_user._get_current_object()
         )
         db.session.add(photo)
+        for obj in objects_list:
+            tag = Tag.query.filter_by(name=obj).first()
+            if not tag:
+                tag = Tag(name=obj)
+                db.session.add(tag)
+            photo.tags.append(tag)
         db.session.commit()
     return render_template('main/upload.html')
 
